@@ -1,5 +1,21 @@
 # drchrono virtual hackathon project 
 
+## TODO
+Doctor:
+-[ ] show scheduled appointments, checked-in patients (waiting times)
+-[ ] change the status of the check-ins
+-[ ] show statistics : number of patients, checked-ins, wait times
+-[ ] auto update of the dashboard
+-[ ] EXTRA: show appointments in different days
+
+Kiosk:
+-[ ] check-in: confirm, update change
+
+Authentication:
+-[ ] set up the kiosk and dashboard
+-[ ] EXTRA: refresh the token access
+
+
 ### Doctor Dashboard
 Description here
 
