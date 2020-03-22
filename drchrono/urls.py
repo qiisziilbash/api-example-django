@@ -11,7 +11,8 @@ urlpatterns = [
     url('ajax/visitPatient/', views.visit_patient, name='visitPatient'),
 
     url(r'^setup/$', views.SetupView.as_view(), name='setup'),
-    url(r'^welcome/$', views.DoctorWelcome.as_view(), name='setup'),
+    url(r'^welcome/$', views.DoctorWelcome.as_view(), name='doctor'),
+    url(r'^kiosk/$', views.KioskWelcome.as_view(), name='kiosk'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'', include('social.apps.django_app.urls', namespace='social')),
 

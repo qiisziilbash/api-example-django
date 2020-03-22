@@ -1,12 +1,11 @@
 import datetime
 
-from utils import get_customized_appointments
-
 from django.http import JsonResponse
 from django.views.generic import TemplateView
 from social_django.models import UserSocialAuth
 
-from drchrono.endpoints import DoctorEndpoint, AppointmentEndpoint, PatientEndpoint
+from utils import get_customized_appointments
+from drchrono.endpoints import DoctorEndpoint, AppointmentEndpoint
 
 
 class SetupView(TemplateView):
@@ -61,7 +60,7 @@ class DoctorWelcome(TemplateView):
 
         appointments = appointment_api.list(date=date)
 
-        return get_customized_appointments(appointments)
+        return get_customized_appointments(appointments, access_token)
 
     def get_context_data(self, **kwargs):
         kwargs = super(DoctorWelcome, self).get_context_data(**kwargs)
