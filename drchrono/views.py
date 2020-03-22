@@ -1,15 +1,31 @@
-from django.shortcuts import redirect
+import datetime
+
+from utils import get_customized_appointments
+
+from django.http import JsonResponse
 from django.views.generic import TemplateView
 from social_django.models import UserSocialAuth
 
-from drchrono.endpoints import DoctorEndpoint
+from drchrono.endpoints import DoctorEndpoint, AppointmentEndpoint, PatientEndpoint
 
 
 class SetupView(TemplateView):
     """
     The beginning of the OAuth sign-in flow. Logs a user into the kiosk, and saves the token.
     """
-    template_name = 'kiosk_setup.html'
+    template_name = 'setup.html'
+
+
+class KioskWelcome(TemplateView):
+    """
+    This is a kiosk that patients can check in
+    """
+    template_name = 'kiosk_welcome.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(KioskWelcome, self).get_context_data(**kwargs)
+
+        return kwargs
 
 
 class DoctorWelcome(TemplateView):
@@ -27,7 +43,7 @@ class DoctorWelcome(TemplateView):
         access_token = oauth_provider.extra_data['access_token']
         return access_token
 
-    def make_api_request(self):
+    def get_doctor(self):
         """
         Use the token we have stored in the DB to make an API request and get doctor details. If this succeeds, we've
         proved that the OAuth setup is working
@@ -39,11 +55,39 @@ class DoctorWelcome(TemplateView):
         # account probably only has one doctor in it.
         return next(api.list())
 
+    def get_appointments(self, date):
+        access_token = self.get_token()
+        appointment_api = AppointmentEndpoint(access_token)
+
+        appointments = appointment_api.list(date=date)
+
+        return get_customized_appointments(appointments)
+
     def get_context_data(self, **kwargs):
         kwargs = super(DoctorWelcome, self).get_context_data(**kwargs)
-        # Hit the API using one of the endpoints just to prove that we can
-        # If this works, then your oAuth setup is working correctly.
-        doctor_details = self.make_api_request()
-        kwargs['doctor'] = doctor_details
+
+        doctor = self.get_doctor()
+        appointments = self.get_appointments(str(datetime.date.today()))
+
+        kwargs['doctor'] = doctor
+        kwargs['appointments'] = appointments
+
         return kwargs
 
+
+def visit_patient(request):
+    """
+    This is an anjax call to update appointment status from 'Checked In' to 'In Session'
+    :param request: request from doctor
+    :return: success msg with some appointment details
+    """
+    appointment_id = request.POST['appointmentID']
+
+    access_token = UserSocialAuth.objects.get(provider='drchrono').extra_data['access_token']
+
+    appointment_api = AppointmentEndpoint(access_token)
+
+    appointment_api.update(appointment_id, {'status': 'In Session'})
+    appointment = appointment_api.fetch(appointment_id)
+
+    return JsonResponse({'msg': 'Success', 'patient': appointment['patient']})

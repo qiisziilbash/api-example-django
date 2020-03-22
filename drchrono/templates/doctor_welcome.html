@@ -1,11 +1,190 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Welcome to drchrono</title>
-</head>
-<body>
-<h1>Welcome {{ doctor.first_name }} {{ doctor.last_name }}</h1>
-{{ doctor }}
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}
+    Welcome to drchrono
+{% endblock %}
+
+
+{% block body %}
+
+
+    <h1>Welcome Dr. {{ doctor.first_name }} {{ doctor.last_name }}
+        <span style="float: right">
+            <div id="clockbox"></div>
+        </span>
+    </h1>
+
+    <hr>
+    <hr>
+
+
+    <div class="row">
+        <div class="column"><h2>Patient in Progress</h2></div>
+        <div class="column"><h2>Today's Appointments</h2></div>
+        <div class="column"><h2>Appointment Details</h2></div>
+    </div>
+
+    <div class="row">
+        <div class="box" id="patient-in-progress">
+            No Patient in progress. Please visit a patient to see the description here.
+        </div>
+
+        <div class="box">
+            <p style="font-weight: bold">Scheduled For
+                <span style="float: right">Waiting Time</span>
+                <hr>
+            </p>
+
+            {% for appointment in appointments %}
+                {% if appointment.status == 'Checked In' %}
+                    <span style="background-color: orange">
+                {% elif appointment.status == 'In Session' %}
+                    <span style="background-color: greenyellow">
+                {% elif appointment.status == 'Cancelled' %}
+                    <span style="background-color: hotpink">
+                {% else %}
+                    <span style="background-color: yellow">
+                {% endif %}
+                        <a href="#" onclick='showAppointmentDetails({{ appointment.id }}, "")' id="{{ appointment.id }}">
+                            {{ appointment.time }} >> {{ appointment.patient }} ({{ appointment.status }})
+                            <span style="float: right">--:--</span>
+                        </a>
+                    </span>
+                    <hr>
+            {% endfor %}
+        </div>
+        <div class="box" id="patient-detail">
+            Click on an appointment to see the details here
+        </div>
+    </div>
+
+
+    <h2>Statistics</h2>
+    <hr>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <script>
+        function showAppointmentDetails(appointmentID, status) {
+            {% for appointment in appointments %}
+                if(appointmentID == {{ appointment.id }}){
+
+                    if(status == "") {
+                        document.getElementById('patient-detail').innerHTML = 'Status: ' + "{{ appointment.status }}";
+                        if ("{{ appointment.status }}" == "Checked In") {
+                            document.getElementById('patient-detail').innerHTML +=
+                                '<span style="float:right"><input type="button" value="Visit" onclick="visitPatient('
+                                + '{{ appointment.id }}' + ');"></span>';
+                        }
+                    }
+                    else {
+                        document.getElementById('patient-detail').innerHTML = 'Status: ' + status;
+                        if (status == "Checked In") {
+                            document.getElementById('patient-detail').innerHTML +=
+                                '<span style="float:right"><input type="button" value="Visit" onclick="visitPatient('
+                                + '{{ appointment.id }}' + ');"></span>';
+                        }
+                    }
+
+                    document.getElementById('patient-detail').innerHTML +=
+                        '<hr>' +
+                        "ID: " + "{{ appointment.id }}" + '<br>' +
+                        "Patient: " + "{{ appointment.patient }}" + '<br>' +
+                        "Time: " +  "{{ appointment.status_change_time}}" + '<br>';
+                }
+            {% endfor %}
+        }
+    </script>
+
+    <script>
+        function visitPatient(appointmentID) {
+            $.ajax({
+                    type: "POST",
+                    url: '/ajax/visitPatient/',
+                    data: {
+                         appointmentID: appointmentID,
+                         csrfmiddlewaretoken: '{{ csrf_token }}',
+                    },
+                    dataType: 'json',
+
+                    success: function (data) {
+                        if(data.msg == 'Success'){
+                            showAppointmentDetails(appointmentID, "In Session");
+                            document.getElementById(appointmentID).parentElement.style.backgroundColor = 'greenyellow';
+                            document.getElementById('patient-in-progress').innerHTML =
+                                'ID: ' + data.patient +
+                                '<span style="float:right"><input type="button" value="Save and End the Session"></span>' +
+                                '<hr>' +
+                                'Notes:<br>' +
+                                '<textarea rows=10 style="width:100%"></textarea><br><br>';
+                        }
+                    }
+                });
+        }
+    </script>
+
+
+
+    <script type="text/javascript">
+            var tday=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+            var tmonth=["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+            function GetClock(){
+                var d=new Date();
+                var nday=d.getDay(),nmonth=d.getMonth(),ndate=d.getDate(),nyear=d.getFullYear();
+                var nhour=d.getHours(),nmin=d.getMinutes(),nsec=d.getSeconds(),ap;
+
+                if(nhour==0){ap=" AM";nhour=12;}
+                else if(nhour<12){ap=" AM";}
+                else if(nhour==12){ap=" PM";}
+                else if(nhour>12){ap=" PM";nhour-=12;}
+
+                if(nmin<=9) nmin="0"+nmin;
+                if(nsec<=9) nsec="0"+nsec;
+
+                var clocktext=""+tday[nday]+", "+ nhour+":"+nmin+ap+"" + " (" +tmonth[nmonth]+" "+ndate+", "+nyear+")";
+                document.getElementById('clockbox').innerHTML=clocktext;
+            }
+
+            GetClock();
+            setInterval(GetClock,1000);
+    </script>
+
+    <script type="text/javascript">
+        function setWaitingClocks() {
+            {% for appointment in appointments %}
+                if("{{ appointment.status }}" == "Checked In"){
+                    getWaitingTime({{ appointment.id }}, {{ appointment.hours }}, {{ appointment.minutes }})
+                    setInterval(getWaitingTime, 60000, {{ appointment.id }}, {{ appointment.hours }}, {{ appointment.minutes }});
+                }
+            {% endfor %}
+        }
+
+        function getWaitingTime(id, hours, minutes){
+            var date = new Date();
+            var nhours = date.getHours();
+            var nmins = date.getMinutes();
+
+            if(nmins >= minutes ){
+                var waiting_minutes = nmins - minutes;
+                var waiting_hours = nhours - hours;
+            }else{
+                var waiting_minutes =  nmins + 60 - minutes;
+                var waiting_hours = nhours - 1 - hours;
+            }
+
+            if(waiting_minutes<=9) waiting_minutes = "0"+waiting_minutes;
+            if(waiting_hours<=9) waiting_hours = "0"+waiting_hours;
+
+            document.getElementById(id).firstElementChild.innerHTML= waiting_hours+":"+waiting_minutes;
+        }
+
+        setWaitingClocks();
+    </script>
+
+
+{% endblock %}

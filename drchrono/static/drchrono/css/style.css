@@ -1,0 +1,20 @@
+.column {
+    float: left;
+    width: 33%;
+}
+
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.box {
+    float: left;
+    padding: .5%;
+    width: 32%;
+    height: 250px;
+    border: black solid 2px;
+    overflow-x: hidden;
+}
