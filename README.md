@@ -2,21 +2,21 @@
 
 ## TODO
 Doctor:
--[x] show scheduled appointments, checked-in patients (waiting times)
--[x] change the status of the check-ins
--[ ] show statistics : number of patients, checked-ins, wait times
--[ ] auto update of the dashboard
--[x] put a running clock for checked in patients
--[ ] EXTRA: show appointments in different days
--[ ] EXTRA: show today's date
+- [x] show scheduled appointments, checked-in patients (waiting times)
+- [x] change the status of the check-ins
+- [ ] show statistics : number of patients, checked-ins, wait times
+- [ ] auto update of the dashboard
+- [x] put a running clock for checked in patients
+- [ ] EXTRA: show appointments in different days
+- [ ] EXTRA: show today's date
 
 Kiosk:
--[ ] check-in: confirm, update change
+- [ ] check-in: confirm, update change
 
 Authentication:
--[ ] set up the kiosk and dashboard
--[ ] show limited access in dashboard if patients wants to access
--[ ] EXTRA: refresh the token access
+- [ ] set up the kiosk and dashboard
+- [ ] show limited access in dashboard if patients wants to access
+- [ ] EXTRA: refresh the token access
 
 
 ### Doctor Dashboard
