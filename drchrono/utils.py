@@ -38,6 +38,7 @@ def get_customized_appointments(appointments, access_token):
                   'id': appointment['id'],
                   'time': time,
                   'status': status,
+                  # TODO : these are just random numbers, pull correct ones from status transition
                   'hours': 14,
                   'minutes': 15}
         results.append(record)
