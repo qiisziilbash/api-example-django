@@ -6,8 +6,8 @@ Doctor:
 - [x] change the status of the check-ins
 - [ ] show statistics : number of patients, checked-ins, wait times
 - [ ] auto update of the dashboard
-     - [ ] webhook verification
-     - [ ] django channedl
+     - [x] webhook verification
+     - [ ] django channel
 - [x] put a running clock for checked in patients
 - [ ] EXTRA: show appointments in different days
 - [x] EXTRA: show today's date
@@ -16,7 +16,7 @@ Kiosk:
 - [x] check-in: confirm, update change
 
 Authentication:
-- [ ] set up the kiosk and dashboard
+- [x] set up the kiosk and dashboard
 - [ ] deauthorize 
 - [ ] show limited access in dashboard if patients wants to access
 - [ ] EXTRA: refresh the token access
@@ -24,6 +24,10 @@ Authentication:
 Tests:
 - [ ] check in backend for uniqueness of 'In Session' appointments
 
+### Webhook instructions
+Tunnel your localhost using: 
+$ ssh -R 80:localhost:8000 ssh.localhost.run
+and add the callback url in drchrono's API
 
 ### Doctor Dashboard
 Description here

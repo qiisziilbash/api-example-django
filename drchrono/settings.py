@@ -99,9 +99,16 @@ STATIC_URL = '/static/'
 
 SOCIAL_AUTH_DRCHRONO_KEY = "EXP1A8MD0JARTgkE8hI2jdWhUTGTNfVTJLgICF9Q"
 SOCIAL_AUTH_DRCHRONO_SECRET = "Gr6ruMO8kSBnpMyQ38tTjj8mj5aqmILamKcpkhmcfjdGMfGPn04DXD7R5rXuDhWkLQIw3jlgzPPiwpdlAUr21po88vtq7DgG07gz2GtrmV5W59JCWpgWrvZWKHscXfzo"
-LOGIN_REDIRECT_URL = "http://localhost:8000/welcome"
+LOGIN_REDIRECT_URL = "http://localhost:8000/dashboard"
 
-WEBHOOK_TOKEN = 'tTjj8mj5aqmILKHscXfzo'
+SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['where']
+
+KIOSK_SCOPE = ["patients:summary:read"]
+DASHBOARD_SCOPE = ["patients:summary:read", "patients:summary:write"]
+
+IGNORE_DEFAULT_SCOPE = True
+
+WEBHOOK_TOKEN = 'sadfasdfsdfadfsdfasdfsa'
 
 
 LOGGING = {

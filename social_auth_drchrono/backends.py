@@ -18,6 +18,17 @@ class drchronoOAuth2(BaseOAuth2):
     ]
     # TODO: setup proper token refreshing
 
+    def get_scope(self):
+        """Return list with needed access scope"""
+        if self.strategy.session_get('where') == 'kiosk':
+            scope = self.setting('KIOSK_SCOPE', [])
+        else:
+            scope = self.setting('DASHBOARD_SCOPE', [])
+
+        if not self.setting('IGNORE_DEFAULT_SCOPE', False):
+            scope = scope + (self.DEFAULT_SCOPE or [])
+        return scope
+
     def get_user_details(self, response):
         """
         Return user details from drchrono account
