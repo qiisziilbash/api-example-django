@@ -1,0 +1,48 @@
+body{
+    background-color: #2aabd2;
+}
+
+
+
+a.custom-button, input[type=submit].custom-button{
+    display: inline-block;
+    padding:0.35em 1.2em;
+    border:0.1em solid #FFFFFF;
+    margin:0 0.3em 0.3em 0;
+    border-radius:0.12em;
+    box-sizing: border-box;
+    text-decoration:none;
+    font-family:'Roboto',sans-serif;
+    color:#FFFFFF;
+    text-align:center;
+    transition: all 0.2s;
+    font-weight: bold;
+    font-size: larger;
+    background-color: transparent;
+}
+
+a.custom-button:hover, input[type=submit].custom-button:hover{
+    color:#000000;
+    background-color:#FFFFFF;
+}
+
+
+.form-container{
+    margin-left: 25% !important;
+    margin-top: 8% !important;
+    width: 50%;
+}
+
+input[type=number], input[type=text]{
+  width: 75%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+    float: right;
+}
+
+label {
+    width: 25%;
+  padding: 12px 12px 12px 0;
+}

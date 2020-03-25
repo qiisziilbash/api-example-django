@@ -6,17 +6,23 @@ Doctor:
 - [x] change the status of the check-ins
 - [ ] show statistics : number of patients, checked-ins, wait times
 - [ ] auto update of the dashboard
+     - [ ] webhook verification
+     - [ ] django channedl
 - [x] put a running clock for checked in patients
 - [ ] EXTRA: show appointments in different days
-- [ ] EXTRA: show today's date
+- [x] EXTRA: show today's date
 
 Kiosk:
-- [ ] check-in: confirm, update change
+- [x] check-in: confirm, update change
 
 Authentication:
 - [ ] set up the kiosk and dashboard
+- [ ] deauthorize 
 - [ ] show limited access in dashboard if patients wants to access
 - [ ] EXTRA: refresh the token access
+
+Tests:
+- [ ] check in backend for uniqueness of 'In Session' appointments
 
 
 ### Doctor Dashboard

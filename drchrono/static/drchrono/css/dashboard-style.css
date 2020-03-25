@@ -1,3 +1,7 @@
+body{
+    background-color: wheat;
+}
+
 .column {
     float: left;
     width: 33%;
@@ -14,7 +18,13 @@
     float: left;
     padding: .5%;
     width: 32%;
-    height: 250px;
+    height: 350px;
     border: black solid 2px;
+    overflow-x: hidden;
+}
+
+.canvas{
+    height: 280px;
+    width: 100%;
     overflow-x: hidden;
 }

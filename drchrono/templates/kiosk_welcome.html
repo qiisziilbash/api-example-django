@@ -1,8 +1,30 @@
-<!DOCTYPE html>
-<html>
-  <body>
-    <h1>
-      welcome to the Check in Kiosk!
-    </h1>
-  </body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Welcome to drchrono
+{% endblock %}
+
+{% block extra_header %}
+    <link rel="stylesheet" href='{% static 'drchrono/css/kiosk-style.css' %}'>
+{% endblock %}
+
+
+{% block body %}
+    <div style="text-align: center">
+        <div class="form-container">
+            <h1>Welcome to Dr. {{ doctor.first_name }} {{ doctor.last_name }}'s Office</h1>
+            <br><br>
+
+            <img src="{%  static 'drchrono/images/checkin.png' %}" style="margin-right: auto; margin-left: auto; display: block;">
+
+            <br><br>
+
+            <span style="left: 50%">
+                <a href="{% url 'kioskCheckin' %}" class="custom-button" >Check-in here</a>
+            </span>
+        </div>
+    </div>
+
+{% endblock %}
+

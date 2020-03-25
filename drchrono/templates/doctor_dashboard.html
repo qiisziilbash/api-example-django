@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Welcome to drchrono
+{% endblock %}
+
+{% block extra_header %}
+        <link rel="stylesheet" href='../static/drchrono/css/dashboard-style.css'>
+{% endblock %}
+
+{% block body %}
+    <h1>Welcome Dr. {{ doctor.first_name }} {{ doctor.last_name }}
+        <span style="float: right">
+            <div id="clockbox"></div>
+        </span>
+    </h1>
+
+    <hr>
+    <hr>
+
+    <div class="row">
+        <div class="column">
+            <h2>Today's Appointments
+            <span style="font-weight: normal; font-size: medium">
+                [
+                <span style="background-color: greenyellow">Complete</span>
+                <span style="background-color: deepskyblue">In Session</span>
+                <span style="background-color: orange">Checked In</span>
+                <span style="background-color: hotpink">Cancelled</span>
+                <span style="background-color: yellow">Other</span>
+                ]
+            </span>
+            </h2>
+
+        </div>
+        <div class="column"><h2>Appointment Details</h2></div>
+        <div class="column"><h2>Patient in Progress</h2></div>
+    </div>
+
+    <div class="row">
+        <div class="box">
+            <p style="font-weight: bold">Scheduled For
+                <span style="float: right">Waiting Time</span>
+                <hr>
+            </p>
+
+        <div class="canvas">
+                        {% for appointment in appointments %}
+                {% if appointment.status == 'Checked In' %}
+                    <span style="background-color: orange" id="{{ appointment.id }}">
+                {% elif appointment.status == 'In Session' %}
+                    <span style="background-color: deepskyblue" id="{{ appointment.id }}">
+                {% elif appointment.status == 'Complete' %}
+                    <span style="background-color: greenyellow" id="{{ appointment.id }}">
+                {% elif appointment.status == 'Cancelled' %}
+                    <span style="background-color: hotpink" id="{{ appointment.id }}">
+                {% else %}
+                    <span style="background-color: yellow" id="{{ appointment.id }}">
+                {% endif %}
+                        <a href="#" onclick='showAppointmentDetails({{ appointment.id }})'>
+                            {{ appointment.time }} >> {{ appointment.patient }}
+                            <span style="float: right">--:--</span>
+                        </a>
+                        <hr>
+                    </span>
+
+            {% endfor %}
+        </div>
+
+        </div>
+        <div class="box" id="patient-detail">
+            Click on an appointment to see the details here
+        </div>
+        <div class="box" id="patient-in-progress">
+            No Patient in progress. Please visit a checked in patient to see the description here.
+        </div>
+    </div>
+
+    <h2>Statistics</h2>
+
+    <hr>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function showAppointmentDetails(appointmentID) {
+            document.getElementById('patient-detail').innerHTML = 'Loading ...';
+            $.ajax({
+                    type: "POST",
+                    url: '/ajax/getAppointment/',
+                    data: {
+                         appointment_id: appointmentID,
+                         csrfmiddlewaretoken: '{{ csrf_token }}',
+                    },
+                    dataType: 'json',
+
+                    success: function (data) {
+                        if(data.msg == 'Success'){
+                            var status_wrapper = '';
+                            if(data.appointment.status == 'Complete'){
+                                status_wrapper = '<span style="background-color: greenyellow">'
+                            }else if(data.appointment.status == 'In Session'){
+                                status_wrapper = '<span style="background-color: deepskyblue">'
+                            }else if(data.appointment.status == 'Checked In'){
+                                status_wrapper = '<span style="background-color: orange">'
+                            }else if(data.appointment.status == 'Cancelled'){
+                                status_wrapper = '<span style="background-color: hopink">'
+                            }else{
+                                status_wrapper = '<span style="background-color: yellow">'
+                            }
+                            document.getElementById('patient-detail').innerHTML = 'Status: ' + status_wrapper  + data.appointment.status + '</span>';
+                            if (data.appointment.status == "Checked In") {
+                                document.getElementById('patient-detail').innerHTML +=
+                                    '<span style="float:right"><input type="button" value="Visit" onclick="visitPatient('
+                                    + data.appointment.id + ');"></span>';
+                            }
+
+                            document.getElementById('patient-detail').innerHTML +=
+                                '<hr>' +
+                                "ID: " + data.appointment.id + '<br>' +
+                                "Patient: " + data.appointment.patient + '<br>' +
+                                'Notes: ' + data.appointment.notes +
+                                '<br>';
+                        }
+                    }
+                });
+        }
+    </script>
+
+    <script>
+        function visitPatient(id) {
+            document.getElementById('patient-detail').innerHTML = 'Updating the appointment status ...';
+            $.ajax({
+                    type: "POST",
+                    url: '/ajax/visitPatient/',
+                    data: {
+                         appointment_id: id,
+                         csrfmiddlewaretoken: '{{ csrf_token }}',
+                    },
+                    dataType: 'json',
+
+                    success: function (data) {
+                        if(data.msg == 'Success'){
+                            showAppointmentDetails(id);
+
+                            document.getElementById(id).style.backgroundColor = 'deepskyblue';
+                            document.getElementById(id).firstElementChild.firstElementChild.innerHTML = '--:--';
+
+                            document.getElementById('patient-in-progress').innerHTML =
+                                'Patient: ' + data.appointment.patient +
+                                '<span style="float:right">'+
+                                '<input type="button" value="Save and End the Session" onclick="finalizeAppointment(' +
+                                data.appointment.id +
+                                ');">' +
+                                '</span>' +
+                                '<hr>' +
+                                'Notes:<br>' +
+                                '<textarea rows=10 style="width:100%" id="appointment-notes">'+
+                                data.appointment.notes +
+                                '</textarea><br><br>';
+                        }
+                    }
+                });
+        }
+    </script>
+
+    <script>
+        function finalizeAppointment(id) {
+            var notes = document.getElementById('appointment-notes').value;
+            document.getElementById('patient-in-progress').innerHTML = 'Submitting your notes and finalizing the appointment ...';
+            $.ajax({
+                    type: "POST",
+                    url: '/ajax/finalizeAppointment/',
+                    data: {
+                        appointment_id: id,
+                        notes : notes,
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                    },
+                    dataType: 'json',
+
+                    success: function (data) {
+                        if(data.msg == 'Success'){
+                            document.getElementById('patient-in-progress').innerHTML =
+                                'No Patient in progress. Please visit a checked in patient to see the description here.';
+                            document.getElementById(id).style.backgroundColor = 'greenyellow';
+                            showAppointmentDetails(id)
+                        }
+                    }
+                });
+        }
+    </script>
+
+    <script>
+        function loadAppointmentInProgress() {
+            {% for appointment in appointments %}
+                if('{{ appointment.status }}' == 'In Session'){
+                    showAppointmentDetails({{ appointment.id }});
+                    document.getElementById('patient-in-progress').innerHTML =
+                            'Patient: ' + '{{ appointment.patient }}' +
+                            '<span style="float:right">'+
+                            '<input type="button" value="Save and End the Session" onclick="finalizeAppointment(' +
+                            '{{ appointment.id }}' +
+                            ');">' +
+                            '</span>' +
+                            '<hr>' +
+                            'Notes:<br>' +
+                            '<textarea rows=10 style="width:100%" id="appointment-notes">' +
+                            '{{ appointment.notes }}' +
+                            '</textarea><br><br>';
+                }
+            {% endfor %}
+        }
+
+        loadAppointmentInProgress();
+
+
+    </script>
+
+    <script type="text/javascript">
+            var tday=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+            var tmonth=["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+            function GetClock(){
+                var d=new Date();
+                var nday=d.getDay(),nmonth=d.getMonth(),ndate=d.getDate(),nyear=d.getFullYear();
+                var nhour=d.getHours(),nmin=d.getMinutes(),nsec=d.getSeconds(),ap;
+
+                if(nhour==0){ap=" AM";nhour=12;}
+                else if(nhour<12){ap=" AM";}
+                else if(nhour==12){ap=" PM";}
+                else if(nhour>12){ap=" PM";nhour-=12;}
+
+                if(nmin<=9) nmin="0"+nmin;
+                if(nsec<=9) nsec="0"+nsec;
+
+                var clocktext=""+tday[nday]+", "+ nhour+":"+nmin+ap+"" + " (" +tmonth[nmonth]+" "+ndate+", "+nyear+")";
+                document.getElementById('clockbox').innerHTML=clocktext;
+            }
+
+            GetClock();
+            setInterval(GetClock,1000);
+    </script>
+
+    <script type="text/javascript">
+        function setWaitingClocks() {
+            {% for appointment in appointments %}
+                if(document.getElementById({{ appointment.id }}).style.backgroundColor == 'orange'){
+                    getWaitingTime({{ appointment.id }}, {{ appointment.hours }}, {{ appointment.minutes }});
+                    setInterval(getWaitingTime, 60000, {{ appointment.id }}, {{ appointment.hours }}, {{ appointment.minutes }});
+                }
+            {% endfor %}
+        }
+
+        function getWaitingTime(id, hours, minutes){
+            if(document.getElementById(id).style.backgroundColor == 'orange'){
+                var date = new Date();
+                var nhours = date.getHours();
+                var nmins = date.getMinutes();
+
+                if(nmins >= minutes ){
+                    var waiting_minutes = nmins - minutes;
+                    var waiting_hours = nhours - hours;
+                }else{
+                    var waiting_minutes =  nmins + 60 - minutes;
+                    var waiting_hours = nhours - 1 - hours;
+                }
+
+                if(waiting_minutes<=9 && waiting_minutes>=0) waiting_minutes = "0"+waiting_minutes;
+                if(waiting_hours<=9 && waiting_hours>=0) waiting_hours = "0"+waiting_hours;
+
+                document.getElementById(id).firstElementChild.firstElementChild.innerHTML= waiting_hours+":"+waiting_minutes;
+            }
+        }
+
+        setWaitingClocks();
+    </script>
+
+
+{% endblock %}

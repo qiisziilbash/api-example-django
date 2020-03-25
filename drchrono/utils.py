@@ -21,9 +21,9 @@ def convert_time(time_in_2400):
 def get_customized_appointments(appointments, access_token):
     """
     this function customize the appointments that are suitable for presentation in doctor dashboard
-    :param appointments: in drchrono format:
+    :param appointments: in drchrono format
     :param access_token: access_token for drchrono api
-    :return: customized appointments
+    :return: list of customized appointments (returns 1 appointment insted of list if only 1 received)
     """
     patient_api = PatientEndpoint(access_token)
 
@@ -32,14 +32,27 @@ def get_customized_appointments(appointments, access_token):
     for appointment in appointments:
         patient = patient_api.fetch(appointment['patient'])
         time = convert_time(appointment['scheduled_time'].split('T')[1])
-        status = appointment['status'] or 'unknown'
 
-        record = {'patient': patient['first_name'] + ' ' + patient['last_name'],
-                  'id': appointment['id'],
-                  'time': time,
-                  'status': status,
-                  # TODO : these are just random numbers, pull correct ones from status transition
-                  'hours': 14,
-                  'minutes': 15}
+
+        record = {
+            'patient': patient['first_name'] + ' ' + patient['last_name'],
+            'patient_race': patient['race'],
+            'id': appointment['id'],
+            'time': time,
+            'status': appointment['status'] or 'Other',
+            'notes': appointment['notes'],
+            # TODO : these are just random numbers, pull correct ones from status transition
+            'hours': 14,
+            'minutes': 15
+        }
+
         results.append(record)
-    return results
+
+    if len(results) == 1:
+        return results[0]
+    else:
+        return results
+
+
+def get_earliest_appointment(appointments):
+    pass

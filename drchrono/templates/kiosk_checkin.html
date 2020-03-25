@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}
+    Welcome to drchrono kiosk
+{% endblock %}
+
+{% block extra_header %}
+    <link rel="stylesheet" href='{% static 'drchrono/css/kiosk-style.css' %}'>
+{% endblock %}
+
+
+{% block body %}
+    <form method="post">
+        {% csrf_token %}
+        <ul>
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+
+        <div class="form-container">
+            <h2>Provide following information to find your appointment:</h2>
+            {% for field in form.visible_fields  %}
+                <span style="color: brown">{{ field.errors }}</span>
+                <label for="{{ field.auto_id }}">{{ field.label }}:</label>
+                {{ field }}
+                <br><br><br>
+            {% endfor %}
+            <br><br>
+            <span>
+                <a href="{% url 'kiosk' %}">
+                    <img src="{% static "drchrono/images/back.png" %}" style="width: 50px; height: 50px" alt="back">
+                </a>
+            </span>
+
+            <input type="submit" class="custom-button"  style="float: right" value="Find Your Appointment">
+        </div>
+    </form>
+{% endblock %}
