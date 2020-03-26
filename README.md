@@ -20,6 +20,8 @@ Authentication:
 - [ ] deauthorize 
 - [ ] show limited access in dashboard if patients wants to access
 - [ ] EXTRA: refresh the token access
+- [ ] redirect everything to setup if not authorized
+
 
 Tests:
 - [ ] check in backend for uniqueness of 'In Session' appointments

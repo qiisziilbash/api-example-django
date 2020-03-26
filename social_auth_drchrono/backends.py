@@ -16,7 +16,6 @@ class drchronoOAuth2(BaseOAuth2):
         ('refresh_token', 'refresh_token'),
         ('expires_in', 'expires_in')
     ]
-    # TODO: setup proper token refreshing
 
     def get_scope(self):
         """Return list with needed access scope"""
@@ -25,8 +24,6 @@ class drchronoOAuth2(BaseOAuth2):
         else:
             scope = self.setting('DASHBOARD_SCOPE', [])
 
-        if not self.setting('IGNORE_DEFAULT_SCOPE', False):
-            scope = scope + (self.DEFAULT_SCOPE or [])
         return scope
 
     def get_user_details(self, response):

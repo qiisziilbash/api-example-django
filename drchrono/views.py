@@ -26,22 +26,26 @@ class SetupView(TemplateView):
     template_name = 'setup.html'
 
 
-class DoctorDashboard(TemplateView, DoctorBasics):
+class DoctorDashboard(View, DoctorBasics):
     """
     The doctor can see what appointments they have today.
     """
     template_name = 'doctor_dashboard.html'
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(DoctorDashboard, self).get_context_data(**kwargs)
+    def get(self, request):
+        """
+        redirects to kiosk if access token is not valid for doctor operations otherwise renders doctor's dashboard
+        """
+        if self.is_doctor():
+            doctor = self.get_doctor()
+            appointments = self.get_customized_appointments(str(datetime.date.today()))
 
-        doctor = self.get_doctor()
-        appointments = self.get_customized_appointments(str(datetime.date.today()))
-
-        kwargs['doctor'] = doctor
-        kwargs['appointments'] = appointments
-
-        return kwargs
+            return render(request, self.template_name, {
+                'doctor': doctor,
+                'appointments': appointments
+            })
+        else:
+            return redirect('kiosk')
 
 
 class KioskWelcome(TemplateView, DoctorBasics):
@@ -248,18 +252,19 @@ def finalize_appointment(request):
 
 @csrf_exempt
 def web_hook_listener(request):
+    """ This function listens to drchrono's webhook and redirects requests that have no 'msg' field to the /setup """
     if request.method == "GET":
-        byte_token = bytearray()
-        byte_token.extend(map(ord, WEBHOOK_TOKEN))
-
         if 'msg' in request.GET:
+            byte_token = bytearray()
+            byte_token.extend(map(ord, WEBHOOK_TOKEN))
             secret_token = hmac.new(byte_token, request.GET['msg'].encode('utf-8'), hashlib.sha256).hexdigest()
         else:
-            secret_token = 'no msg in get'
+            return redirect('setup')
 
         return JsonResponse({
             'secret_token': secret_token
         })
+
     if request.method == "POST":
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)

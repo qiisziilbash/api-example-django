@@ -103,10 +103,10 @@ LOGIN_REDIRECT_URL = "http://localhost:8000/dashboard"
 
 SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['where']
 
-KIOSK_SCOPE = ["patients:summary:read"]
-DASHBOARD_SCOPE = ["patients:summary:read", "patients:summary:write"]
+KIOSK_SCOPE = ["user:read patients:read calendar:read clinical:read"]
+# empty scope is for all permissions
+DASHBOARD_SCOPE = []
 
-IGNORE_DEFAULT_SCOPE = True
 
 WEBHOOK_TOKEN = 'sadfasdfsdfadfsdfasdfsa'
 

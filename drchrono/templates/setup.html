@@ -1,14 +1,37 @@
 <!DOCTYPE html>
 <html>
   <body>
-    <a href="{% url 'social:begin' 'drchrono' %}?where=kiosk">
-      Set up your Check-in kiosk!
-    </a>
 
-    <br><br>
-
-    <a href="{% url 'social:begin' 'drchrono' %}?where=dashboard">
-      Set up your dashboard!
-    </a>
   </body>
 </html>
+
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Welcome to drchrono
+{% endblock %}
+
+{% block extra_header %}
+    <link rel="stylesheet" href='{% static 'drchrono/css/kiosk-style.css' %}'>
+{% endblock %}
+
+
+{% block body %}
+    <div style="text-align: center">
+        <div class="form-container">
+            <h1>Welcome to "Doctor! Doctor! I am stressed" Project </h1>
+            <br><br>
+
+            <span style="left: 50%">
+                <a href="{% url 'social:begin' 'drchrono' %}?where=kiosk" class="custom-button" >Set up your Check-in kiosk</a>
+            </span>
+
+            <span style="left: 50%">
+                <a href="{% url 'social:begin' 'drchrono' %}?where=dashboard" class="custom-button" >Set up your dashboard</a>
+            </span>
+        </div>
+    </div>
+
+{% endblock %}

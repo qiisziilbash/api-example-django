@@ -1,5 +1,7 @@
+import json
+
 from social_django.models import UserSocialAuth
-from drchrono.endpoints import PatientEndpoint, DoctorEndpoint, AppointmentEndpoint
+from drchrono.endpoints import *
 
 
 def convert_time(time_in_2400):
@@ -75,6 +77,7 @@ def decorate_appointments(appointments, access_token):
 
 class KioskBasics:
     """ this class contains basic functions necessary for kiosk views to verify patient"""
+
     def verify_patient(self, patients, first_name, last_name):
         """ verifies if there is a patient in patients with given first and last names"""
         patient_user = None
@@ -182,3 +185,16 @@ class DoctorBasics:
         appointments = decorate_appointments(appointments, self.get_token())
 
         return appointments
+
+    def is_doctor(self):
+        appointment_profile_api = AppointmentProfileEndpoint(self.get_token())
+
+        try:
+            doctor = self.get_doctor()
+            appointment_profile_api.fetch(doctor['id'])
+        except NotFound:
+            return True
+        except Forbidden:
+            return False
+
+        return True
