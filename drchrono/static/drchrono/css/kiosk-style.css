@@ -2,7 +2,13 @@ body{
     background-color: #2aabd2;
 }
 
-
+.center-logo{
+    margin-right: auto;
+    margin-left: auto;
+    display: block;
+    width: 500px;
+    height: 500px;
+}
 
 a.custom-button, input[type=submit].custom-button{
     display: inline-block;
@@ -34,15 +40,16 @@ a.custom-button:hover, input[type=submit].custom-button:hover{
 }
 
 input[type=number], input[type=text]{
-  width: 75%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  resize: vertical;
+    width: 75%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
     float: right;
 }
 
 label {
     width: 25%;
-  padding: 12px 12px 12px 0;
+    padding: 12px 12px 12px 0;
+    font-weight: bold;
 }

@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block extra_header %}
-    <meta http-equiv="refresh" content="4;{% url 'kiosk' %}" />
+    <meta http-equiv="refresh" content="4;{% url 'setup' %}" />
     <link rel="stylesheet" href='{% static 'drchrono/css/kiosk-style.css' %}'>
 {% endblock %}
 
@@ -14,9 +14,12 @@
 {% block body %}
     <div style="display: inline; text-align: center">
         <div class="form-container">
-            <h1> You successfully checked in. Please wait for doctor to call you in.</h1>
+            <h1> You do not have access to the {{where}}! </h1>
+            <h1> Being redirected to the setup page ...</h1>
+
             <br><br>
-            <img src="{% static 'drchrono/images/success.png' %}" class="center-logo">
+
+            <img src="{% static 'drchrono/images/forbidden.png' %}" class="center-logo">
         </div>
     </div>
 

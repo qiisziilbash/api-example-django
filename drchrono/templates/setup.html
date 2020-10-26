@@ -21,16 +21,38 @@
 {% block body %}
     <div style="text-align: center">
         <div class="form-container">
-            <h1>Welcome to "Doctor! Doctor! I am stressed" Project </h1>
+            <h1>Welcome to "Doctor! Doctor! I am stressed!" Project </h1>
             <br><br>
 
-            <span style="left: 50%">
-                <a href="{% url 'social:begin' 'drchrono' %}?where=kiosk" class="custom-button" >Set up your Check-in kiosk</a>
-            </span>
+            <img src="{% static 'drchrono/images/medical.png' %}" class="center-logo">
 
-            <span style="left: 50%">
-                <a href="{% url 'social:begin' 'drchrono' %}?where=dashboard" class="custom-button" >Set up your dashboard</a>
-            </span>
+            {% if 'dashboard' in permissions %}
+                <span style="left: 50%">
+                    <a href="{% url 'dashboard' %}" class="custom-button" >Go to your dashboard</a>
+                </span>
+
+                <span style="left: 50%">
+                    <a href="{% url 'kiosk' %}" class="custom-button" >Go to your kiosk</a>
+                </span>
+
+                <span style="left: 50%">
+                    <a href="{% url 'setup' 'deauthorize' %}" class="custom-button" >De-authorize</a>
+                </span>
+
+            {% elif 'kiosk' in permissions %}
+                <p>The kiosk is already active. In order to de-authorize the kiosk, go to your DrChrono Account in App Dictionary.</p>
+                <span style="left: 50%">
+                    <a href="{% url 'kiosk' %}" class="custom-button" >Back to Kiosk</a>
+                </span>
+            {% else %}
+                <span style="left: 50%">
+                    <a href="{% url 'social:begin' 'drchrono' %}?where=kiosk" class="custom-button" >Set up your Check-in kiosk</a>
+                </span>
+
+                <span style="left: 50%">
+                    <a href="{% url 'social:begin' 'drchrono' %}?where=dashboard" class="custom-button" >Set up your dashboard</a>
+                </span>
+            {% endif %}
         </div>
     </div>
 

@@ -18,12 +18,25 @@ from .utils import DoctorBasics, KioskBasics, decorate_appointments
 from .settings import WEBHOOK_TOKEN
 
 
-class SetupView(TemplateView):
+class SetupView(View, DoctorBasics):
     """
     The beginning of the OAuth sign-in flow. Logs a doctor into the kiosk or dashboard, and saves the token.
     """
 
     template_name = 'setup.html'
+
+    def get(self, request, opr=''):
+        if opr == 'deauthorize':
+            self.deauthorize()
+            return redirect('setup')
+
+        permissions = self.get_permissions()
+
+        return render(request, self.template_name, {'permissions': permissions})
+
+    def deauthorize(self):
+        o = UserSocialAuth.objects.get(provider='drchrono')
+        o.save()
 
 
 class DoctorDashboard(View, DoctorBasics):
@@ -34,31 +47,36 @@ class DoctorDashboard(View, DoctorBasics):
 
     def get(self, request):
         """
-        redirects to kiosk if access token is not valid for doctor operations otherwise renders doctor's dashboard
+        redirects to kiosk or setup if access token has not valid permissions otherwise renders doctor's dashboard
         """
-        if self.is_doctor():
+        permissions = self.get_permissions()
+
+        if 'dashboard' in permissions:
             doctor = self.get_doctor()
             appointments = self.get_customized_appointments(str(datetime.date.today()))
-
             return render(request, self.template_name, {
                 'doctor': doctor,
                 'appointments': appointments
             })
-        else:
+        elif 'kiosk' in permissions:
             return redirect('kiosk')
+        else:
+            return render(request, 'forbidden.html', {'where': 'dashboard'})
 
 
-class KioskWelcome(TemplateView, DoctorBasics):
+class KioskWelcome(View, DoctorBasics):
     """
     This is a kiosk view that patients can check in
     """
     template_name = 'kiosk_welcome.html'
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(KioskWelcome, self).get_context_data(**kwargs)
-        kwargs['doctor'] = self.get_doctor()
-
-        return kwargs
+    def get(self, request):
+        permissions = self.get_permissions()
+        if 'kiosk' in permissions:
+            doctor = self.get_doctor()
+            return render(request, self.template_name, {'doctor': doctor})
+        else:
+            return render(request, 'forbidden.html', {'where': 'kiosk'})
 
 
 class KioskCheckIn(View, DoctorBasics, KioskBasics):

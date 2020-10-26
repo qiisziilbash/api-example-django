@@ -22,6 +22,7 @@
 
         <div class="form-container">
             <h2>Provide following information to find your appointment:</h2>
+            <br>
             {% for field in form.visible_fields  %}
                 <span style="color: brown">{{ field.errors }}</span>
                 <label for="{{ field.auto_id }}">{{ field.label }}:</label>

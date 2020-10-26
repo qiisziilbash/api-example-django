@@ -13,6 +13,7 @@ urlpatterns = [
     path('', views.web_hook_listener, name='webHookListener'),
 
     url(r'^setup/$', views.SetupView.as_view(), name='setup'),
+    url(r'^setup/(?P<opr>\w+)/$', views.SetupView.as_view(), name='setup'),
 
     url(r'^dashboard/$', views.DoctorDashboard.as_view(), name='dashboard'),
 

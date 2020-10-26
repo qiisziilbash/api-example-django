@@ -22,6 +22,7 @@
 
         <div class="form-container">
             <h2>Update your information to finalize your check in:</h2>
+            <br>
             {% for field in form.visible_fields  %}
                 <span style="color: brown">{{ field.errors }}</span>
                 <label for="{{ field.auto_id }}">{{ field.label }}:</label>
@@ -35,7 +36,7 @@
                 </a>
             </span>
 
-            <input type="submit" class="custom-button"  style="float: right" value="Finalize">
+            <input type="submit" class="custom-button"  style="float: right" value="Check-in">
         </div>
     </form>
 {% endblock %}

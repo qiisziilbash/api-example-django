@@ -116,8 +116,13 @@ class DoctorBasics:
         Social Auth module is configured to store our access tokens. This dark magic will fetch it for us if we've
         already signed in.
         """
-        oauth_provider = UserSocialAuth.objects.get(provider='drchrono')
-        access_token = oauth_provider.extra_data['access_token']
+        access_token = ''
+        try:
+            oauth_provider = UserSocialAuth.objects.get(provider='drchrono')
+            access_token = oauth_provider.extra_data['access_token']
+        except:
+            return access_token
+
         return access_token
 
     def get_doctor(self):
@@ -186,15 +191,29 @@ class DoctorBasics:
 
         return appointments
 
-    def is_doctor(self):
+    def get_permissions(self):
+        """
+        This function checks the level of request permissions
+        :return: [] if no access at all; ['kiosk'] if this is kiosk; ['kiosk', 'dashboard'] if this is doctor
+        """
+        permissions = []
         appointment_profile_api = AppointmentProfileEndpoint(self.get_token())
 
+        # check for kiosk permission, kiosk should be able to access doctor information
         try:
             doctor = self.get_doctor()
+        except APIException:
+            return permissions
+
+        permissions.append('kiosk')
+
+        # check for dashboard permission; dashboard should be able to access appointment profiles
+        try:
             appointment_profile_api.fetch(doctor['id'])
         except NotFound:
-            return True
+            permissions.append('dashboard')
         except Forbidden:
-            return False
+            return permissions
 
-        return True
+        return permissions
+
